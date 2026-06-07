@@ -1,7 +1,6 @@
 workflows:
   nokhpaty-ios:
     name: Nokhpaty iOS Build
-    max_build_duration: 60
 
     environment:
       node: 18
@@ -10,44 +9,13 @@ workflows:
       - name: Install dependencies
         script: npm install
 
-      - name: Ensure Capacitor installed
-        script: |
-          npm install @capacitor/core @capacitor/cli @capacitor/ios
+      - name: Capacitor sync
+        script: npx cap sync ios
 
-      - name: Capacitor Sync (clean)
-        script: |
-          node node_modules/@capacitor/cli/bin/capacitor.js copy ios || true
-          node node_modules/@capacitor/cli/bin/capacitor.js sync ios || true
-
-      - name: Debug iOS structure
-        script: |
-          echo "=== iOS folder ==="
-          ls -la ios/App || true
-
-      - name: Install CocoaPods (strict)
+      - name: Build iOS App (SPM)
         script: |
           cd ios/App
-
-          if [ ! -f Podfile ]; then
-            echo "❌ Podfile missing - forcing full Capacitor sync"
-            cd ../..
-            npx cap sync ios
-            cd ios/App
-          fi
-
-          pod install --repo-update
-
-          if [ ! -d "App.xcworkspace" ]; then
-            echo "❌ Workspace still missing after pod install"
-            exit 1
-          fi
-
-      - name: Build iOS App
-        script: |
-          cd ios/App
-
           xcodebuild \
-            -workspace App.xcworkspace \
             -scheme App \
             -configuration Release \
             -archivePath build/App.xcarchive \
