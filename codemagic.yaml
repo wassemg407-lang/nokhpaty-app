@@ -14,18 +14,15 @@ workflows:
         script: |
           npm install @capacitor/core @capacitor/cli @capacitor/ios
 
-      - name: Fix permissions
-        script: chmod -R +x node_modules || true
-
-      - name: Capacitor Sync SAFE (no npx)
+      - name: Capacitor Sync (clean)
         script: |
           node node_modules/@capacitor/cli/bin/capacitor.js copy ios || true
           node node_modules/@capacitor/cli/bin/capacitor.js sync ios || true
 
-      - name: Install CocoaPods
+      - name: Install CocoaPods (generate workspace)
         script: |
           cd ios/App
-          pod install || true
+          pod install
 
       - name: Build iOS App
         script: |
