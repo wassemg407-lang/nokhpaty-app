@@ -19,26 +19,33 @@ workflows:
           node node_modules/@capacitor/cli/bin/capacitor.js copy ios || true
           node node_modules/@capacitor/cli/bin/capacitor.js sync ios || true
 
-      - name: Verify iOS project
+      - name: Debug iOS structure
         script: |
-          ls ios/App || true
+          echo "=== iOS folder ==="
+          ls -la ios/App || true
 
-      - name: Install CocoaPods safely
+      - name: Install CocoaPods (strict)
         script: |
           cd ios/App
-          if [ -f Podfile ]; then
-            pod install
-          else
-            echo "Podfile missing - forcing Capacitor sync"
+
+          if [ ! -f Podfile ]; then
+            echo "❌ Podfile missing - forcing full Capacitor sync"
             cd ../..
             npx cap sync ios
             cd ios/App
-            pod install || true
+          fi
+
+          pod install --repo-update
+
+          if [ ! -d "App.xcworkspace" ]; then
+            echo "❌ Workspace still missing after pod install"
+            exit 1
           fi
 
       - name: Build iOS App
         script: |
           cd ios/App
+
           xcodebuild \
             -workspace App.xcworkspace \
             -scheme App \
