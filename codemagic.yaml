@@ -1,0 +1,22 @@
+workflows:
+  nokhpaty-ios:
+    name: Nokhpaty iOS Build
+    max_build_duration: 60
+
+    environment:
+      node: latest
+
+    scripts:
+      - name: Install dependencies
+        script: npm install
+
+      - name: Sync Capacitor
+        script: npx cap sync ios
+
+    artifacts:
+      - build/**
+
+    publishing:
+      email:
+        recipients:
+          - wassemg407@gmail.com
