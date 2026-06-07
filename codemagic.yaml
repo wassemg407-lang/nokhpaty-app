@@ -13,12 +13,16 @@ workflows:
       - name: Install Capacitor iOS
         script: npm install @capacitor/ios
 
-      - name: Sync Capacitor
-        script: npx cap sync ios
+      - name: Capacitor Sync (safe mode)
+        script: |
+          chmod +x node_modules/.bin/* || true
+          npx cap copy ios
+          npx cap sync ios
 
     artifacts:
       - ios/**/*.ipa
       - ios/build/**
+      - ios/App/build/**
 
     publishing:
       email:
