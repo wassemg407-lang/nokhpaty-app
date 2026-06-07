@@ -13,16 +13,30 @@ workflows:
       - name: Install Capacitor iOS
         script: npm install @capacitor/ios
 
-      - name: Capacitor Sync (safe mode)
+      - name: Capacitor Sync
         script: |
-          chmod +x node_modules/.bin/* || true
           npx cap copy ios
           npx cap sync ios
 
+      - name: Install CocoaPods
+        script: |
+          cd ios/App
+          pod install || true
+
+      - name: Build iOS App (Archive)
+        script: |
+          cd ios/App
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -archivePath build/App.xcarchive \
+            archive
+
     artifacts:
+      - ios/App/build/*.xcarchive
       - ios/**/*.ipa
       - ios/build/**
-      - ios/App/build/**
 
     publishing:
       email:
